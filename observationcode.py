@@ -56,7 +56,10 @@ medianstack_err = 1.25 * clipped_df.std()[flx_band_idx] * flux_space_conversion 
 ###############################################################################
 #below here will be the fitting process#
 #if in future doing normed bands then remove norm band from fit
-###############################################################################
+##############################################################################
+
+median_z = clipped_df['ZSPEC_NEW'].median()
+band_wavelengths = band_wavelengths / (1. + median_z)
 
 band_wavelengths_inter = band_wavelengths[7:]
 medianstack_inter = medianstack[7:]
@@ -100,8 +103,8 @@ plt.plot(lambda_range,flux_fitted, label=r'$\beta_{fit}$'+str(round(betafit,2)) 
 plt.xlabel(r'$\lambda/microns$')
 plt.ylabel('Flux')
 plt.legend(fontsize='small')
-plt.savefig('medstack_betafit4.png')
-plt.show()
+plt.savefig('medstack_betafit4_deshift.png')
+#plt.show()
 
 
 #medstack_betafit1.png from letting IA598 be norm band and estimate.
