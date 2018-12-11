@@ -56,8 +56,8 @@ y_data2 = 1.086*np.log(f_intrins_norm/f_fake2_norm)
 y_data_err = np.full(f_intrins_norm.shape, 0.001)
 
 
-def model_curve(x, a0, a1, A_598):
-    return a0*x +a1*(x**2.0) - A_598
+def model_curve(x, a0, a1, Av):
+    return a0*x +a1*(x**2.0) - Av
 
 # def chi_squared1(a0,a1,A_598):
 #     return np.sum( ( ( y_data1 - model_curve((1./lambda_fake), a0,a1,A_598))/ y_data_err )**2.0 )
@@ -73,16 +73,16 @@ testx = 1.0 / ( lambda_fake[IA_mask] )
 testy1 = y_data1[IA_mask]
 testy2 = y_data2[IA_mask]
 
-#method not using chisq >>> either use ful test data or IA only.
-popt1, pcov1 = curve_fit(model_curve, testx, testy1, sigma=y_data_err[IA_mask])
-print('Fitted params a0,a1,A_598 are -'+str(popt1))
-popt2, pcov2 = curve_fit(model_curve, testx, testy2, sigma=y_data_err[IA_mask])
-print('Fitted params a0,a1,A_598 are -'+str(popt2))
-
-# popt1, pcov1 = curve_fit(model_curve, (1.0/lambda_fake), y_data1, sigma=y_data_err)
+#method not using chisq
+# popt1, pcov1 = curve_fit(model_curve, testx, testy1, sigma=y_data_err[IA_mask])
 # print('Fitted params a0,a1,A_598 are -'+str(popt1))
-# popt2, pcov2 = curve_fit(model_curve, (1.0/lambda_fake), y_data2, sigma=y_data_err)
+# popt2, pcov2 = curve_fit(model_curve, testx, testy2, sigma=y_data_err[IA_mask])
 # print('Fitted params a0,a1,A_598 are -'+str(popt2))
+
+popt1, pcov1 = curve_fit(model_curve, (1.0/lambda_fake), y_data1, sigma=y_data_err)
+print('Fitted params a0,a1,A_598 are -'+str(popt1))
+popt2, pcov2 = curve_fit(model_curve, (1.0/lambda_fake), y_data2, sigma=y_data_err)
+print('Fitted params a0,a1,A_598 are -'+str(popt2))
 
 attn_curve_fit1 = ( popt1[0]*(lambda_fake**-1.0) + popt1[1]*(lambda_fake**-2.0) ) / popt1[2]
 attn_curve_fit2 = ( popt2[0]*(lambda_fake**-1.0) + popt2[1]*(lambda_fake**-2.0) ) / popt2[2]
@@ -110,7 +110,7 @@ plt.plot(lambda_fake, attn_curve_fit2, linestyle='-', marker=',', label='fake2')
 plt.plot(lambda_fake, smc_curve, label='SMC', linestyle='--')
 plt.plot(lambda_fake, calz_curve, label='Calzetti', linestyle='--')
 
-plt.plot(1/testx,attn_curve_fit1[IA_mask],linestyle='None',marker='+',label='Fitted pts')
+#plt.plot(1/testx,attn_curve_fit1[IA_mask], color='k', linestyle='None',marker=',',label='Fitted pts')
 plt.axvspan(0.125, 0.253, facecolor='g', alpha=0.5)
 
 plt.xlim(xmin=0.1)

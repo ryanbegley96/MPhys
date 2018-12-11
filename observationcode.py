@@ -29,7 +29,7 @@ band_wavelengths = np.array([.4511,.5396,.6517,.7838,1.2461,1.6534,2.1323, \
 
 #below is conversion factor for each band from fv to flambda
 flux_space_conversion = 1.0E-22 * 2.998E8 * ( band_wavelengths * 1.0E-6 )**-2.0
-print('No. of objects in catalog - '+str(len(clean_df)))
+#print('No. of objects in catalog - '+str(len(clean_df)))
 
 #function takes in dataframe, and returns new df after sigma clipping
 def sigma_clipping(df_input):
@@ -56,7 +56,10 @@ medianstack_err = 1.25 * clipped_df.std()[flx_band_idx] * flux_space_conversion 
 ###############################################################################
 #below here will be the fitting process#
 #if in future doing normed bands then remove norm band from fit
-###############################################################################
+##############################################################################
+
+median_z = clipped_df['ZSPEC_NEW'].median()
+band_wavelengths = band_wavelengths / (1. + median_z)
 
 band_wavelengths_inter = band_wavelengths[7:]
 medianstack_inter = medianstack[7:]
@@ -83,9 +86,11 @@ min_inst = Minuit(chi_squared, norm=norm_estimate, beta=beta_estimate,         \
 chisq_min, results = min_inst.migrad()
 
 #fit results
-print(results)
+#print(results)
 normfit = results[0]['value']
 betafit = results[1]['value']
+
+#print(normfit*0.55**betafit)
 
 #plotting of original data and fitted line
 lambda_range = np.linspace(band_wavelengths.min(), band_wavelengths.max(),50)
@@ -100,8 +105,8 @@ plt.plot(lambda_range,flux_fitted, label=r'$\beta_{fit}$'+str(round(betafit,2)) 
 plt.xlabel(r'$\lambda/microns$')
 plt.ylabel('Flux')
 plt.legend(fontsize='small')
-plt.savefig('medstack_betafit4.png')
-plt.show()
+# plt.savefig('medstack_betafit4_deshift.png')
+# plt.show()
 
 
 #medstack_betafit1.png from letting IA598 be norm band and estimate.
